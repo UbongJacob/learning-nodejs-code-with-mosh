@@ -1,6 +1,8 @@
 const helmet = require("helmet");
 const Joi = require("joi");
 const config = require("config");
+const startupDebugger = require("debug")("app:startup");
+const dbDebugger = require("debug")("app:db");
 const morgan = require("morgan");
 const express = require("express");
 const logger = require("./logger");
@@ -17,8 +19,10 @@ console.log(`Mail server ${config.get("mail.host")}`);
 
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));
-  console.log("Morgan enabled....");
+  startupDebugger("Morgan enabled....");
 }
+
+dbDebugger("Connected to the database...");
 
 app.use(logger);
 
