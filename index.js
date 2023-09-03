@@ -1,9 +1,31 @@
+const helmet = require("helmet");
 const Joi = require("joi");
+const config = require("config");
+const morgan = require("morgan");
 const express = require("express");
-
+const logger = require("./logger");
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+app.use(helmet());
+
+// CONFIGURATIONS
+console.log(`Application name ${config.get("name")}`);
+console.log(`Mail server ${config.get("mail.host")}`);
+
+if (app.get("env") === "development") {
+  app.use(morgan("tiny"));
+  console.log("Morgan enabled....");
+}
+
+app.use(logger);
+
+app.use((req, res, next) => {
+  console.log("Authenticating");
+  next();
+});
 
 const notFoundMessage = (id) =>
   `The course with the given ID ${id} was not found.`;
