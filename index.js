@@ -45,10 +45,7 @@ app.put("/api/courses/:id", (req, res) => {
   const reqID = req.params.id;
   const course = courses.find((course) => course.id === parseInt(reqID));
   // If not existing,return 404
-  if (!course) {
-    res.status(404).send(notFoundMessage(reqID)); //404
-    return;
-  }
+  if (!course) return res.status(404).send(notFoundMessage(reqID)); //404
 
   //   Validate course
   const { error } = validateCourse(req.body);
@@ -64,13 +61,32 @@ app.put("/api/courses/:id", (req, res) => {
   // Return the updated course
 });
 
+app.delete("/api/courses/:id", (req, res) => {
+  // Look up the course
+  const reqID = req.params.id;
+  const course = courses.find((course) => course.id === parseInt(reqID));
+  // If not existing,return 404
+  if (!course) return res.status(404).send(notFoundMessage(reqID)); //404
+
+  //   Validate course
+  const { error } = validateCourse(req.body);
+  // if invalid  return 400 -Bad request
+  if (error) return res.status(400).send(error.message);
+
+  // Delete course
+  const courseIndex = courses.indexOf(course);
+  courses.splice(courseIndex, 1);
+
+  // Return the deleted course
+  res.send(course);
+});
+
 app.get("/api/courses/:id", (req, res) => {
   const reqID = req.params.id;
   const course = courses.find((course) => course.id === parseInt(reqID));
-  if (!course) {
-    res.status(404).send(notFoundMessage(reqID)); //404
-    return;
-  } else res.send(course);
+  if (!course) return res.status(404).send(notFoundMessage(reqID)); //404
+
+  res.send(course);
 });
 
 function validateCourse(course) {
